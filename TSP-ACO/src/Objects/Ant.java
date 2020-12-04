@@ -30,7 +30,6 @@ public class Ant {
 				this.eta[i][j] = i == j ? 0 : 1/this.graph.getDistanceMatrix()[i][j];
 			}
 		}
-//		int start = (int)(Math.random() * ((graph.getRank() + 1)));
 		int start = (int)(Math.random() * ( graph.getRank() ));
 		this.tabu.add(start);
 		this.current = start;
@@ -83,6 +82,7 @@ public class Ant {
 	
 	public void setPheronomeDelta(double phero, int i, int j) {
 		this.pheronome_delta[i][j] = phero;
+		this.pheronome_delta[j][i] = phero;
 	}
 	
 	public int getCurrent() {
@@ -99,6 +99,7 @@ public class Ant {
 	
 	public void setEta(double e, int i, int j) {
 		this.eta[i][j] = e;
+		this.eta[j][i] = e;
 	}
 	
 	public void select_next() {
@@ -111,7 +112,6 @@ public class Ant {
 		}
 		
 		double[] probabilities = new double[this.rank];
-//		probabilities = [0 for i in range(self.graph.rank)] 
 		for(int i=0; i<this.rank; i++) {
 			try {
 				if(this.allowed.get(i) == true) {
@@ -124,25 +124,34 @@ public class Ant {
 			}
 		}
 		int selected = 0;
-		double rand = Math.random();
+		double max = 0;
 		for(int i=0; i<this.rank; i++) {
-			rand -= probabilities[i];
-			if(rand<=0) {
+			if(max < probabilities[i]) {
+				max = probabilities[i];
 				selected = i;
-				break;
 			}
 		}
-//		this.allowed.remove(new Integer(selected));
+//		int selected = 0;
+//		double rand = Math.random();
+//		for(int i=0; i<this.rank; i++) {
+//			rand -= probabilities[i];
+//			if(rand<=0) {
+//				selected = i;
+//				break;
+//			}
+//		}
 		this.allowed.set(selected, false);
 		this.tabu.add(selected);
 		this.total_cost += this.graph.getDistanceMatrix()[this.current][selected];
 	}
 	
 	public void updatePheronomeDelta() {
+		this.pheronome_delta = new double[rank][rank];
 		for(int k=1; k<this.tabu.size(); k++) {
 			int i = this.tabu.get(k-1);
 			int j = this.tabu.get(k);
 			this.pheronome_delta[i][j] = this.colony.getQ() / this.graph.getDistanceMatrix()[i][j];
+			this.pheronome_delta[j][i] = this.colony.getQ() / this.graph.getDistanceMatrix()[i][j];
 		}
 	}
 	

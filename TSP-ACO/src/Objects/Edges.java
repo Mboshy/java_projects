@@ -29,6 +29,7 @@ public class Edges {
 	
 	public void setDistanceMatrix(double distance, int i, int j) {
 		this.distance_matrix[i][j] = distance;
+		this.distance_matrix[j][i] = distance;
 	}
 	
 	public double[][] getDistanceMatrix() {
@@ -37,6 +38,7 @@ public class Edges {
 	
 	public void setPheronome(double phero, int i, int j) {
 		this.pheronome[i][j] = phero;
+		this.pheronome[j][i] = phero;
 	}
 	
 	public double[][] getPheronome() {

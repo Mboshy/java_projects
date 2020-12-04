@@ -9,7 +9,7 @@ public class AntSystem {
 	private int generations;
 	private double alpha;
 	private double beta;
-	private double evaporate_coeff;
+	private double rho;
 	private double Q;
 	
 	/**
@@ -24,7 +24,7 @@ public class AntSystem {
 		this.generations = generations;
 		this.alpha = alpha;
 		this.beta = beta;
-		this.evaporate_coeff = rho;
+		this.rho = rho;
 		this.Q = q;
 	}
 	
@@ -45,11 +45,11 @@ public class AntSystem {
 	}
 	
 	public void setRho(double rho) {
-		this.evaporate_coeff = rho;
+		this.rho = rho;
 	}
 	
 	public double getRho() {
-		return this.evaporate_coeff;
+		return this.rho;
 	}
 	
 	public void setQ(double q) {
@@ -79,9 +79,11 @@ public class AntSystem {
 	public void pheronomeUpdate(int length, Edges graph, ArrayList<Ant> ants) {
 		for(int i=0; i<length; i++) {
 			for(int j=0; j<length; j++) {
-				graph.setPheronome((1-this.evaporate_coeff)*graph.getPheronome()[i][j], i, j);
+				graph.setPheronome((1-this.rho)*graph.getPheronome()[i][j], i, j);
+				graph.setPheronome((1-this.rho)*graph.getPheronome()[j][i], j, i);
 				for(Ant a : ants) {
 					graph.setPheronome(graph.getPheronome()[i][j]+a.getPheronomeDelta()[i][j], i, j);
+					graph.setPheronome(graph.getPheronome()[j][i]+a.getPheronomeDelta()[j][i], j, i);
 				}
 			}
 		}

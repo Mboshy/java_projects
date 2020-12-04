@@ -7,6 +7,10 @@ import Objects.Ant;
 import Objects.Edges;
 import Solutions.AntSystem;
 
+import java.io.FileWriter;
+import java.io.File;
+//import java.io.IOException;
+
 public class Traveler {
 	
     public static ArrayList<int[]> returnScanner() throws Exception {
@@ -60,11 +64,27 @@ public class Traveler {
 		System.out.println(storing.size());
 		double[][] dist_matrix = distanceMatrix(storing);
 		
-		AntSystem aco = new AntSystem(10, 100, 1.0, 10.0, 0.5, 10);
+		AntSystem aco = new AntSystem(10, 200, 1.0, 10.0, 0.5, 10);
 		Edges graph = new Edges(len, dist_matrix);
 		
 		ArrayList<Integer> best_solution = solve(len, graph, aco);
 		System.out.println("hmm");
+		
+		File file = new File("test.csv");
+        FileWriter fw = new FileWriter(file);
+
+        fw.write("City,x,y\n");
+        for(int i=0;i<best_solution.size();i++)
+        {
+        	fw.write(Integer.toString(best_solution.get(i)) + "," + 
+        			Integer.toString(storing.get( best_solution.get(i) )[0]) + "," + 
+        			Integer.toString(storing.get( best_solution.get(i) )[1]));
+        	fw.write("\n");
+        }
+
+        fw.close();
+		System.out.println("DONE");
+
 	}
 
 }
