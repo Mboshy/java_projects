@@ -1,8 +1,11 @@
 package Runable;
 
-import java.util.ArrayList;
+import java.util.*;
 
 import FileOperator.Reader;
+import Objects.Ant;
+import Objects.Edges;
+import Solutions.AntSystem;
 
 public class Traveler {
 	
@@ -24,11 +27,44 @@ public class Traveler {
     	}
     	return dist_matrix;
     }
+    
+	public static ArrayList<Integer> solve(int rank, Edges graph, AntSystem aco) throws Exception{
+		double best_cost = Double.MAX_VALUE;
+		ArrayList<Integer> best_solution = new ArrayList<>();
+		for(int gen=0; gen<aco.getGenerations(); gen++) {
+			ArrayList<Ant> ants = new ArrayList<>();
+			for(int i=0; i<aco.getAnthCount(); i++) {
+				Ant ant = new Ant(rank, aco, graph);
+				ants.add(ant);
+			}
+			for(Ant ant : ants) {
+				for(int i=0; i<graph.getRank()-1; i++) {
+					ant.select_next();
+				}
+				ant.setTotalCost(ant.getTotalCost() + 
+						graph.getDistanceMatrix()[ ant.getTabu().get( ant.getTabu().size()-1 ) ][ ant.getTabu().get(0) ]);
+				if(ant.getTotalCost() < best_cost) {
+					best_cost = ant.getTotalCost();
+					best_solution = new ArrayList<>(ant.getTabu());
+				}
+				ant.updatePheronomeDelta();
+			}
+			aco.pheronomeUpdate(rank, graph, ants);
+		}
+		return best_solution;
+	}
 
 	public static void main(String[] args) throws Exception {
 		ArrayList<int[]> storing = returnScanner();
+		int len = storing.size();
 		System.out.println(storing.size());
 		double[][] dist_matrix = distanceMatrix(storing);
+		
+		AntSystem aco = new AntSystem(10, 100, 1.0, 10.0, 0.5, 10);
+		Edges graph = new Edges(len, dist_matrix);
+		
+		ArrayList<Integer> best_solution = solve(len, graph, aco);
+		System.out.println("hmm");
 	}
 
 }

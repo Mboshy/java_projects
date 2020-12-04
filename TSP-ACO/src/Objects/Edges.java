@@ -6,17 +6,17 @@ public class Edges {
 	private double[][] pheronome;
 	
 	/**
-	 * @param len This is rank of the distance matrix
+	 * @param rank This is rank of the distance matrix
 	 * @param dist_mat This is matrix with calculated distances between cities */
 	public Edges(int rank, double[][] dist_mat) throws Exception{
 		this.rank = rank;
 		this.distance_matrix = dist_mat;
 		this.pheronome = new double[rank][rank];
-//		for(int i=0; i<len; i++) {
-//    		for(int j=0; j<len; j++) {
-//    			this.pheronome[i][j] = 1/(len*len);
-//    		}
-//		}
+		for(int i=0; i<rank; i++) {
+    		for(int j=0; j<rank; j++) {
+    			this.pheronome[i][j] = Double.valueOf(1)/(rank*rank);
+    		}
+		}
 	}
 	
 	public void setEank(int rank) {
