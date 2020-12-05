@@ -9,12 +9,17 @@ public class Ant {
 	private double total_cost;
 	private ArrayList<Integer> tabu;
 	private double[][] pheronome_delta;
-	private ArrayList<Boolean> allowed;
+	private boolean[] allowed;
 	private double[][] eta;
 	private int current;
 	private int rank;
 	
 	public Ant(int rank, AntSystem colony, Edges graph) throws Exception{
+		/**
+		 * @param rank This is number of cities
+		 * @param colony This is object of AntSystem class with parameters used in solution
+		 * @param graph This is object of Edges class, it represents connections and their weigths between cities
+		 */
 		this.rank = rank;
 		this.colony = colony;
 		this.graph = graph;
@@ -22,9 +27,9 @@ public class Ant {
 		this.tabu = new ArrayList<>();
 		this.pheronome_delta = new double[rank][rank];
 		this.eta = new double[rank][rank];
-		this.allowed = new ArrayList<>();
+		this.allowed = new boolean[rank];
 		for(int i=0; i<graph.getRank(); i++)
-			this.allowed.add(true);
+			this.allowed[i] = true;
 		for(int i=0; i<graph.getRank(); i++) {
 			for(int j=0; j<graph.getRank(); j++) {
 				this.eta[i][j] = i == j ? 0 : 1/this.graph.getDistanceMatrix()[i][j];
@@ -33,7 +38,7 @@ public class Ant {
 		int start = (int)(Math.random() * ( graph.getRank() ));
 		this.tabu.add(start);
 		this.current = start;
-		this.allowed.set(start, false);
+		this.allowed[start] = false;
 	}
 	
 	public AntSystem getColony() {
@@ -68,12 +73,12 @@ public class Ant {
 		this.tabu.add(tab);
 	}
 	
-	public ArrayList<Boolean> getAllowed(){
+	public boolean[] getAllowed(){
 		return this.allowed;
 	}
 	
-	public void addAllowed(Boolean allow) {
-		this.allowed.add(allow);
+	public void setAllowed(Boolean allow, int i) {
+		this.allowed[i] = allow;
 	}
 	
 	public double[][] getPheronomeDelta(){
@@ -103,55 +108,57 @@ public class Ant {
 	}
 	
 	public void select_next() {
-		double denominator = 0;
-		for(int i = 0; i<allowed.size(); i++) {
-			if(this.allowed.get(i) == true) {
-				denominator += Math.pow(this.graph.getPheronome()[this.current][i], this.colony.getAlpha()) * 
+		/**
+		 * This function searches for best connection to next city
+		 */
+		double denominator = 0.0;
+		for(int i=0; i<this.rank; i++) {
+			if(this.allowed[i] == true) {
+				denominator += Math.pow(this.graph.getPheronome()[this.current][i], this.colony.getAlpha()) *
 						Math.pow(this.eta[this.current][i], this.colony.getBeta());
 			}
 		}
-		
 		double[] probabilities = new double[this.rank];
 		for(int i=0; i<this.rank; i++) {
-			try {
-				if(this.allowed.get(i) == true) {
-					probabilities[i] = Math.pow(this.graph.getPheronome()[this.current][i], this.colony.getAlpha()) *
-									Math.pow(this.eta[this.current][i], this.colony.getBeta()) / denominator;
-				}
-			}
-			catch (Exception e) {
-//				System.out.print(e);
+			if(this.allowed[i] == true) {
+				probabilities[i] =  (Math.pow(this.graph.getPheronome()[this.current][i], this.colony.getAlpha()) *
+						Math.pow(this.eta[this.current][i], this.colony.getBeta())) / denominator;
 			}
 		}
-		int selected = 0;
-		double max = 0;
-		for(int i=0; i<this.rank; i++) {
-			if(max < probabilities[i]) {
-				max = probabilities[i];
-				selected = i;
-			}
-		}
+//		Random rand = new Random();
 //		int selected = 0;
-//		double rand = Math.random();
+//		double random_value = rand.nextDouble();
 //		for(int i=0; i<this.rank; i++) {
-//			rand -= probabilities[i];
-//			if(rand<=0) {
+//			random_value -= probabilities[i];
+//			if(random_value <= 0) {
 //				selected = i;
 //				break;
 //			}
 //		}
-		this.allowed.set(selected, false);
+		int selected = 0;
+		double max = 0;
+		for(int i=0; i<this.rank; i++) {
+			if(max < probabilities[i]) {
+				selected = i;
+				max = probabilities[i];
+			}
+		}
+		this.allowed[selected] = false;
 		this.tabu.add(selected);
 		this.total_cost += this.graph.getDistanceMatrix()[this.current][selected];
+		this.current = selected;
 	}
 	
 	public void updatePheronomeDelta() {
+		/**
+		 * This method updates pheronome which was left in one iteration of traversal
+		 */
 		this.pheronome_delta = new double[rank][rank];
 		for(int k=1; k<this.tabu.size(); k++) {
 			int i = this.tabu.get(k-1);
 			int j = this.tabu.get(k);
 			this.pheronome_delta[i][j] = this.colony.getQ() / this.graph.getDistanceMatrix()[i][j];
-			this.pheronome_delta[j][i] = this.colony.getQ() / this.graph.getDistanceMatrix()[i][j];
+			this.pheronome_delta[j][i] = this.colony.getQ() / this.graph.getDistanceMatrix()[j][i];
 		}
 	}
 	

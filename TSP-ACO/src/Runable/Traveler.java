@@ -16,11 +16,14 @@ public class Traveler {
     public static ArrayList<int[]> returnScanner() throws Exception {
     	/**
     	 * It just simply read the tsp file*/
-    	Reader tree = new Reader();
+    	Reader tree = new Reader("xqf131.tsp");
         return tree.storing;
     }
     
     static double[][] distanceMatrix(ArrayList<int[]> storing){
+    	/**
+    	 * @param storing This is array [n_cities x 2] 
+    	 * @return This is matrix [n_cities x n_cities] with distance between cities */
     	int len = storing.size();
     	double[][] dist_matrix = new double[len][len];
     	for(int i=0; i<len; i++) {
@@ -33,6 +36,13 @@ public class Traveler {
     }
     
 	public static ArrayList<Integer> solve(int rank, Edges graph, AntSystem aco) throws Exception{
+		/**
+		 * This method finds best solution to TSP problem
+		 * @param rank This is number of cities
+		 * @param graph This is object of Edges class, it represents connections and their weigths between cities
+		 * @param aco This is object of AntSystem class, it contains parameters used to find best solution
+		 * @return best_solution This is ArrayList with the order of visited cities
+		 */
 		double best_cost = Double.MAX_VALUE;
 		ArrayList<Integer> best_solution = new ArrayList<>();
 		for(int gen=0; gen<aco.getGenerations(); gen++) {
@@ -59,18 +69,20 @@ public class Traveler {
 	}
 
 	public static void main(String[] args) throws Exception {
+		// It reads input file
 		ArrayList<int[]> storing = returnScanner();
 		int len = storing.size();
 		System.out.println(storing.size());
 		double[][] dist_matrix = distanceMatrix(storing);
 		
-		AntSystem aco = new AntSystem(10, 200, 1.0, 10.0, 0.5, 10);
+		// Generates main objects
+		AntSystem aco = new AntSystem(10, 500, 1.0, 10.0, 0.5, 10);
 		Edges graph = new Edges(len, dist_matrix);
-		
+		// Finds best solution
 		ArrayList<Integer> best_solution = solve(len, graph, aco);
-		System.out.println("hmm");
 		
-		File file = new File("test.csv");
+		// Saves solution to csv file
+		File file = new File("result/xqf131.csv");
         FileWriter fw = new FileWriter(file);
 
         fw.write("City,x,y\n");

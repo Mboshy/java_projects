@@ -14,7 +14,7 @@ public class Edges {
 		this.pheronome = new double[rank][rank];
 		for(int i=0; i<rank; i++) {
     		for(int j=0; j<rank; j++) {
-    			this.pheronome[i][j] = Double.valueOf(1)/(rank*rank);
+    			this.pheronome[i][j] = Double.valueOf(1)/(rank);
     		}
 		}
 	}

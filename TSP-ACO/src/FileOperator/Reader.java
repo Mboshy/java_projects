@@ -7,10 +7,11 @@ public class Reader {
 	public ArrayList<int[]> storing;
 
 	/**
+	 * @param path to the file
 	 * This method reads tsp file. It omits headers and add values to list
 	 * The values are passed to n x 2 array list*/
-    public Reader() throws Exception {
-        File file = new File("bcl380.tsp");
+    public Reader(String path) throws Exception {
+        File file = new File(path);
         Scanner sc = new Scanner(file);
         storing = new ArrayList<int[]>();
         String nextValue = null;

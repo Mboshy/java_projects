@@ -76,14 +76,20 @@ public class AntSystem {
 		return this.num_ants;
 	}
 	
-	public void pheronomeUpdate(int length, Edges graph, ArrayList<Ant> ants) {
-		for(int i=0; i<length; i++) {
-			for(int j=0; j<length; j++) {
-				graph.setPheronome((1-this.rho)*graph.getPheronome()[i][j], i, j);
-				graph.setPheronome((1-this.rho)*graph.getPheronome()[j][i], j, i);
+	public void pheronomeUpdate(int rank, Edges graph, ArrayList<Ant> ants) {
+		/**
+		 * This method updates pheronome left on on routes
+		 * @param rank This is number of cities 
+		 * @param graph This is object of Edges class, it represents connections and their weigths between cities
+		 * @param ants This is ArrayList of Ant class objects
+		 */
+		for(int i=0; i<rank; i++) {
+			for(int j=0; j<rank; j++) {
+				graph.setPheronome(( (1-this.rho)*graph.getPheronome()[i][j] ), i, j);
+				graph.setPheronome(( (1-this.rho)*graph.getPheronome()[j][i] ), j, i);
 				for(Ant a : ants) {
-					graph.setPheronome(graph.getPheronome()[i][j]+a.getPheronomeDelta()[i][j], i, j);
-					graph.setPheronome(graph.getPheronome()[j][i]+a.getPheronomeDelta()[j][i], j, i);
+					graph.setPheronome(( graph.getPheronome()[i][j]+a.getPheronomeDelta()[i][j] ), i, j);
+					graph.setPheronome(( graph.getPheronome()[j][i]+a.getPheronomeDelta()[j][i] ), j, i);
 				}
 			}
 		}
